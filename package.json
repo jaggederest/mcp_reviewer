@@ -12,20 +12,29 @@
     "lint": "eslint src",
     "test": "CI=true vitest run --bail=1",
     "test:unit": "CI=true vitest run --bail=1 --exclude=**/*.integration.test.ts",
-    "test:integration": "CI=true vitest run --bail=1 **/*.integration.test.ts"
+    "test:integration": "CI=true vitest run --bail=1 **/*.integration.test.ts",
+    "test:coverage": "CI=true vitest run --coverage --exclude=**/*.integration.test.ts",
+    "test:coverage:all": "CI=true vitest run --coverage"
   },
-  "keywords": ["mcp", "ai", "openai", "code-review", "development"],
+  "keywords": [
+    "mcp",
+    "ai",
+    "openai",
+    "code-review",
+    "development"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
+    "dotenv": "^16.4.7",
     "openai": "^4.73.0",
-    "zod": "^3.24.1",
-    "dotenv": "^16.4.7"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.9",
     "eslint": "^9.17.0",
     "globals": "^15.14.0",
     "tsx": "^4.19.2",
