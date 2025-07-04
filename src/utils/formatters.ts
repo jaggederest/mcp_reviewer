@@ -69,7 +69,7 @@ export function formatExecOutput(
   return parts.join(' | ');
 }
 
-// New formatter for full output (only used for failures)
+// Formatter for full output (used for failures and coverage reports)
 export function formatExecOutputFull(
   output: string,
   error: string | undefined,
@@ -77,7 +77,13 @@ export function formatExecOutputFull(
   actionName: string
 ): string {
   const parts: string[] = [];
-  parts.push(`❌ ${actionName}: Failed (exit ${exitCode})`);
+  
+  // Show appropriate status
+  if (exitCode === 0) {
+    parts.push(`✅ ${actionName}: Success`);
+  } else {
+    parts.push(`❌ ${actionName}: Failed (exit ${exitCode})`);
+  }
   
   // Get full output, preferring stderr over stdout
   const errorOutput = error ?? '';

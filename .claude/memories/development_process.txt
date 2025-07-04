@@ -1,0 +1,1 @@
+Follow this process: 1) Generate spec using mcp__reviewer__generate_spec, 2) Adjust spec with user feedback, 3) Review spec using mcp__reviewer__review_spec, 4) Write code implementation, 5) Review code using mcp__reviewer__review_code, 6) Adjust based on review feedback, 7) Run mcp__reviewer__run_linter and mcp__reviewer__run_tests throughout development

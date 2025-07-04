@@ -1,0 +1,1 @@
+When generating specs, provide detailed context about the project and requirements. The spec tool works best with clear problem statements and technical constraints.
