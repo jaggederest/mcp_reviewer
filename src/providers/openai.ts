@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { AIProvider } from './types.js';
+import { ProviderError } from './errors.js';
 
 export class OpenAIProvider implements AIProvider {
   public readonly name = 'OpenAI';
@@ -25,8 +26,7 @@ export class OpenAIProvider implements AIProvider {
 
       return response.choices[0]?.message?.content ?? 'No response generated';
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`OpenAI API call failed: ${errorMessage}`);
+      throw new ProviderError(this.name, error);
     }
   }
 }

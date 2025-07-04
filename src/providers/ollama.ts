@@ -1,4 +1,5 @@
 import { AIProvider } from './types.js';
+import { ProviderError } from './errors.js';
 
 interface OllamaResponse {
   model: string;
@@ -44,8 +45,7 @@ export class OllamaProvider implements AIProvider {
       const data = await response.json() as OllamaResponse;
       return data.message.content;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Ollama API call failed: ${errorMessage}`);
+      throw new ProviderError(this.name, error);
     }
   }
 }

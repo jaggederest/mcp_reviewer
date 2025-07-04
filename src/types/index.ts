@@ -1,7 +1,6 @@
 export interface ProjectConfig {
   testCommand?: string;
   lintCommand?: string;
-  buildCommand?: string;
   openaiModel?: string;
   aiProvider?: 'openai' | 'ollama';
   ollamaBaseUrl?: string;
@@ -26,13 +25,10 @@ export interface CodeReviewOptions {
 }
 
 export interface TestRunnerOptions {
-  testCommand?: string;
   pattern?: string;
-  watch?: boolean;
 }
 
 export interface LinterOptions {
-  lintCommand?: string;
   fix?: boolean;
   files?: string[];
 }

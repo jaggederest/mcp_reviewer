@@ -21,9 +21,9 @@ async function checkOllamaConnection(): Promise<boolean> {
 async function checkOllamaModels(): Promise<string[]> {
   try {
     const response = await fetch('http://localhost:11434/api/tags');
-    if (!response.ok) return [];
-    const data = await response.json() as { models?: Array<{ name: string }> };
-    return data.models?.map(m => m.name) || [];
+    if (!response.ok) {return [];}
+    const data = await response.json() as { models?: { name: string }[] };
+    return data.models?.map(m => m.name) ?? [];
   } catch {
     return [];
   }
@@ -67,8 +67,8 @@ describe('End-to-End MCP Workflow with Ollama', () => {
     }
 
     // Use TinyLlama if available, otherwise use the first available model
-    const modelToUse = models.find(m => m.includes('tinyllama')) || 
-                      models.find(m => m.includes('llama2') || m.includes('codellama')) || 
+    const modelToUse = models.find(m => m.includes('tinyllama')) ?? 
+                      models.find(m => m.includes('llama2') || m.includes('codellama')) ?? 
                       models[0];
 
     const transport = new StdioClientTransport({
@@ -78,7 +78,7 @@ describe('End-to-End MCP Workflow with Ollama', () => {
         ...process.env,
         AI_PROVIDER: 'ollama',
         OLLAMA_MODEL: modelToUse,
-        OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+        OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434',
       },
     });
 

@@ -8,7 +8,6 @@ function getDefaultConfig(): ProjectConfig {
   return {
     testCommand: 'npm test',
     lintCommand: 'npm run lint',
-    buildCommand: 'npm run build',
     openaiModel: process.env.OPENAI_MODEL ?? 'o1-preview',
     aiProvider: (process.env.AI_PROVIDER as 'openai' | 'ollama' | undefined) ?? 'openai',
     ollamaBaseUrl: process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434',
@@ -36,14 +35,6 @@ export async function loadProjectConfig(): Promise<ProjectConfig> {
     cachedConfig = getDefaultConfig();
     return cachedConfig;
   }
-}
-
-export function getOpenAIKey(): string {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error('OPENAI_API_KEY environment variable is not set');
-  }
-  return apiKey;
 }
 
 // For testing purposes only

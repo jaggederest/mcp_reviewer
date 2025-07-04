@@ -44,7 +44,7 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': 'off', // MCP server uses stdio for communication
       'prefer-const': 'error',
       'no-var': 'error',
       'eqeqeq': ['error', 'always'],

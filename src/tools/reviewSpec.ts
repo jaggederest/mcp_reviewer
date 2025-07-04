@@ -1,11 +1,15 @@
 import { SpecReviewOptions } from '../types/index.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { callAI } from '../utils/ai.js';
+import { BaseAITool } from './ai-base.js';
 
-export async function reviewSpec(args: SpecReviewOptions): Promise<CallToolResult> {
-  const { spec, focusAreas = [] } = args;
-  
-  const systemPrompt = `You are a critical technical reviewer specializing in specification analysis. Review the provided specification and provide constructive, critical feedback.
+class ReviewSpecTool extends BaseAITool<SpecReviewOptions> {
+  protected getActionName(): string {
+    return 'reviewing specification';
+  }
+
+  protected getSystemPrompt(args: SpecReviewOptions): string {
+    const { focusAreas = [] } = args;
+    return `You are a critical technical reviewer specializing in specification analysis. Review the provided specification and provide constructive, critical feedback.
 Focus on:
 - Completeness and clarity of requirements
 - Technical feasibility and architectural soundness
@@ -16,25 +20,16 @@ Focus on:
 ${focusAreas.length > 0 ? `\nPay special attention to these areas: ${focusAreas.join(', ')}` : ''}
 
 Be direct and specific in your feedback. Point out both strengths and weaknesses.`;
-
-  const userPrompt = `Review this specification:\n\n${spec}`;
-  
-  try {
-    const result = await callAI(systemPrompt, userPrompt);
-    
-    return {
-      content: [{
-        type: 'text',
-        text: result,
-      }],
-    };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return {
-      content: [{
-        type: 'text',
-        text: `Error reviewing specification: ${errorMessage}`,
-      }],
-    };
   }
+
+  protected getUserPrompt(args: SpecReviewOptions): string {
+    const { spec } = args;
+    return `Review this specification:\n\n${spec}`;
+  }
+}
+
+const tool = new ReviewSpecTool();
+
+export async function reviewSpec(args: SpecReviewOptions): Promise<CallToolResult> {
+  return tool.execute(args);
 }

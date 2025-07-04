@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { readFile } from 'fs/promises';
-import { loadProjectConfig, getOpenAIKey, resetConfigCache } from './config.js';
+import { loadProjectConfig, resetConfigCache } from './config.js';
 
 vi.mock('fs/promises');
 
@@ -21,7 +21,6 @@ describe('config utilities', () => {
       expect(config).toEqual({
         testCommand: 'npm test',
         lintCommand: 'npm run lint',
-        buildCommand: 'npm run build',
         openaiModel: 'o1-preview',
         aiProvider: 'openai',
         ollamaBaseUrl: 'http://localhost:11434',
@@ -42,7 +41,6 @@ describe('config utilities', () => {
       expect(config).toEqual({
         testCommand: 'yarn test',
         lintCommand: 'npm run lint',
-        buildCommand: 'npm run build',
         openaiModel: 'gpt-4',
         aiProvider: 'openai',
         ollamaBaseUrl: 'http://localhost:11434',
@@ -60,15 +58,4 @@ describe('config utilities', () => {
     });
   });
 
-  describe('getOpenAIKey', () => {
-    it('should return API key when set', () => {
-      process.env.OPENAI_API_KEY = 'test-key-123';
-      
-      expect(getOpenAIKey()).toBe('test-key-123');
-    });
-
-    it('should throw error when API key is not set', () => {
-      expect(() => getOpenAIKey()).toThrow('OPENAI_API_KEY environment variable is not set');
-    });
-  });
 });

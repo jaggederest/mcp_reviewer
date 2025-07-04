@@ -68,11 +68,9 @@ server.registerTool(
 server.registerTool(
   'run_tests',
   {
-    description: 'Run standardized tests for the project',
+    description: 'Run standardized tests for the project (with coverage when no pattern specified)',
     inputSchema: {
-      testCommand: z.string().optional().describe('Test command to run (defaults to configured command)'),
-      pattern: z.string().optional().describe('Test file pattern to match'),
-      watch: z.boolean().optional().default(false).describe('Run tests in watch mode'),
+      pattern: z.string().optional().describe('Test file pattern to match (runs coverage mode if omitted)'),
     },
   },
   async (args) => runTests(args)
@@ -84,7 +82,6 @@ server.registerTool(
   {
     description: 'Run standardized linter for the project',
     inputSchema: {
-      lintCommand: z.string().optional().describe('Lint command to run (defaults to configured command)'),
       fix: z.boolean().optional().default(false).describe('Attempt to fix issues automatically'),
       files: z.array(z.string()).optional().describe('Specific files to lint'),
     },
@@ -93,6 +90,41 @@ server.registerTool(
 );
 
 async function main(): Promise<void> {
+  // Check if running in doctor mode
+  const args = process.argv.slice(2);
+  if (args.includes('--doctor') || args.includes('--check')) {
+    console.log('🏥 Running MCP server health check...\n');
+    
+    try {
+      // Test loading configuration
+      const { loadProjectConfig } = await import('./utils/config.js');
+      const config = await loadProjectConfig();
+      console.log('✅ Configuration loaded successfully');
+      console.log(`   AI Provider: ${config.aiProvider ?? 'default'}`);
+      console.log(`   Model: ${String(config.aiProvider === 'ollama' ? config.ollamaModel : config.openaiModel)}`);
+      
+      // Test AI provider initialization
+      const { getAIProvider } = await import('./utils/ai.js');
+      const provider = await getAIProvider();
+      console.log(`✅ AI provider (${provider.name}) initialized`);
+      
+      // List available tools
+      console.log('\n📦 Available tools:');
+      console.log('   - generate_spec: Generate technical specifications');
+      console.log('   - review_spec: Review specifications for completeness');
+      console.log('   - review_code: Review code changes');
+      console.log('   - run_tests: Run project tests');
+      console.log('   - run_linter: Run project linter');
+      
+      console.log('\n✨ All systems operational!');
+      process.exit(0);
+    } catch (error) {
+      console.error('❌ Health check failed:', error);
+      process.exit(1);
+    }
+  }
+  
+  // Normal server mode
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error('Reviewer MCP service started');

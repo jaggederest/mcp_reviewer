@@ -1,11 +1,15 @@
 import { SpecGenerationOptions } from '../types/index.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { callAI } from '../utils/ai.js';
+import { BaseAITool } from './ai-base.js';
 
-export async function generateSpec(args: SpecGenerationOptions): Promise<CallToolResult> {
-  const { prompt, context, format = 'markdown' } = args;
-  
-  const systemPrompt = `You are a technical specification writer. Generate detailed, clear, and actionable specifications based on the requirements provided. 
+class GenerateSpecTool extends BaseAITool<SpecGenerationOptions> {
+  protected getActionName(): string {
+    return 'generating specification';
+  }
+
+  protected getSystemPrompt(args: SpecGenerationOptions): string {
+    const { format = 'markdown' } = args;
+    return `You are a technical specification writer. Generate detailed, clear, and actionable specifications based on the requirements provided. 
 ${format === 'structured' ? 'Output in a structured format with clear sections, requirements, and acceptance criteria.' : 'Output in clean markdown format.'}
 Focus on:
 - Clear objectives and goals
@@ -14,25 +18,16 @@ Focus on:
 - Implementation approach
 - Success criteria and testing requirements
 - Edge cases and error handling`;
-
-  const userPrompt = `Generate a specification for: ${prompt}${context ? `\n\nAdditional context: ${context}` : ''}`;
-  
-  try {
-    const result = await callAI(systemPrompt, userPrompt);
-    
-    return {
-      content: [{
-        type: 'text',
-        text: result,
-      }],
-    };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return {
-      content: [{
-        type: 'text',
-        text: `Error generating specification: ${errorMessage}`,
-      }],
-    };
   }
+
+  protected getUserPrompt(args: SpecGenerationOptions): string {
+    const { prompt, context } = args;
+    return `Generate a specification for: ${prompt}${context ? `\n\nAdditional context: ${context}` : ''}`;
+  }
+}
+
+const tool = new GenerateSpecTool();
+
+export async function generateSpec(args: SpecGenerationOptions): Promise<CallToolResult> {
+  return tool.execute(args);
 }

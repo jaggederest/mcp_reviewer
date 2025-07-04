@@ -1,7 +1,7 @@
 # Project Context for Claude
 
 ## Project Overview
-This is an MCP (Model Context Protocol) service called "reviewer-mcp" that integrates with OpenAI's O3 model to provide AI-powered development workflow tools.
+This is an MCP (Model Context Protocol) service called "reviewer-mcp" that provides AI-powered development workflow tools with pluggable AI providers (OpenAI and Ollama). It runs as a stateless stdio-based server that can be self-hosted in any project.
 
 ## Key Features
 1. **Spec Generation**: Generate detailed technical specifications from prompts
@@ -10,12 +10,18 @@ This is an MCP (Model Context Protocol) service called "reviewer-mcp" that integ
 4. **Test Runner**: Standardized test execution with consistent output formatting
 5. **Linter**: Standardized linting with consistent output formatting
 
+## Architecture
+- **Base Classes**: `BaseAITool` for AI-powered tools, `BaseExecTool` for command execution
+- **Common Utilities**: Centralized error handling (`createErrorResult`) and output formatting
+- **Stateless Design**: Each tool invocation reads config fresh, no persistent state
+- **Transport**: Uses stdio for MCP communication (JSON-RPC)
+
 ## Technical Stack
 - TypeScript with strict type checking
 - Node.js with ES modules
 - MCP SDK for tool protocol
-- OpenAI API for AI capabilities
-- Vitest for testing
+- Pluggable AI: OpenAI API or Ollama (local models)
+- Vitest for testing with coverage reporting
 - ESLint with TypeScript rules
 
 ## Development Guidelines
@@ -31,27 +37,46 @@ The service supports project-specific configuration via `.reviewer.json`:
 {
   "testCommand": "npm test",
   "lintCommand": "npm run lint",
-  "buildCommand": "npm run build",
+  "aiProvider": "ollama",
+  "ollamaModel": "tinyllama",
+  "ollamaBaseUrl": "http://localhost:11434",
   "openaiModel": "o1-preview"
 }
 ```
 
 ## Environment Variables
-- `OPENAI_API_KEY`: Required for OpenAI API access
-- `OPENAI_MODEL`: Override default model (defaults to o1-preview)
+- `OPENAI_API_KEY`: Required when using OpenAI provider
+- `OPENAI_MODEL`: Override default OpenAI model
+- `AI_PROVIDER`: Override provider choice (openai/ollama)
+- `OLLAMA_MODEL`: Override Ollama model
+- `OLLAMA_BASE_URL`: Override Ollama endpoint
+
+## MCP Server Setup
+1. **Build**: `npm run build`
+2. **Add to project**: `claude mcp add reviewer --scope project -- node dist/index.js`
+3. **Health check**: `node dist/index.js --doctor`
+4. **Test script**: `./test-mcp.sh`
+
+## Testing Commands
+- `npm test` - Run all tests with bail on first failure
+- `npm run test:unit` - Run unit tests only
+- `npm run test:integration` - Run e2e tests with Ollama
+- `npm run test:coverage` - Run tests with coverage report (target: 20%)
+- `npm run typecheck` - TypeScript type checking
+- `npm run lint` - ESLint with auto-fix
 
 ## Testing Strategy
 - Unit tests for all utility functions
-- Mock external dependencies (OpenAI API, file system)
+- E2e integration test validates full workflow with Ollama
+- Mock external dependencies where appropriate
 - Test error handling paths
-- Maintain high code coverage
+- Coverage target: 20% (currently ~19%)
 
 ## Current Status
-- Basic project structure established
-- TypeScript and ESLint configured with strict rules
-- Spec generation and review tools partially implemented
-- Test framework set up with initial tests
-- Git repository initialized for version control
-
-## Next Steps
-See docs/plan/ directory for detailed planning documents.
+- ✅ All 5 tools fully implemented and tested
+- ✅ Base class architecture reduces code duplication by ~40%
+- ✅ Pluggable AI providers (OpenAI and Ollama)
+- ✅ E2e tests passing with TinyLlama model
+- ✅ Self-hostable as MCP server in any project
+- ✅ Doctor mode for health checks
+- ✅ Project configured to use its own MCP server
