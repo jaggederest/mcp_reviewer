@@ -318,3 +318,43 @@ class MusicTool extends BaseExecTool<MusicOptions> {
 
 const tool = new MusicTool();
 export const music = (args: MusicOptions): Promise<CallToolResult> => tool.execute(args);
+
+// Export helper functions for other tools to use
+export async function isSpotifyPlaying(): Promise<boolean> {
+  if (platform() !== 'darwin') {
+    return false;
+  }
+  
+  try {
+    const { stdout } = await execAsync(`osascript -e 'tell application "Spotify" to player state as string'`);
+    return stdout.trim() === 'playing';
+  } catch {
+    return false;
+  }
+}
+
+export async function pauseSpotify(): Promise<void> {
+  if (platform() !== 'darwin') {
+    return;
+  }
+  
+  try {
+    await execAsync(`osascript -e 'tell application "Spotify" to pause'`);
+    // Give a small delay for the pause to take effect
+    await new Promise(resolve => setTimeout(resolve, 200));
+  } catch {
+    // Ignore errors - Spotify might not be running
+  }
+}
+
+export async function resumeSpotify(): Promise<void> {
+  if (platform() !== 'darwin') {
+    return;
+  }
+  
+  try {
+    await execAsync(`osascript -e 'tell application "Spotify" to play'`);
+  } catch {
+    // Ignore errors - Spotify might not be running
+  }
+}

@@ -11,6 +11,7 @@ This is an MCP (Model Context Protocol) service called "reviewer-mcp" that provi
 5. **Linter**: Standardized linting with consistent output formatting
 6. **Music Control**: Spotify integration with configurable playlists and safety features (macOS only)
 7. **Notifications**: Audio notifications for alerts and status updates (macOS only)
+8. **Memory Storage**: Temporary in-memory key-value storage for session context (data lost on restart)
 
 ## Architecture
 - **Base Classes**: `BaseAITool` for AI-powered tools, `BaseExecTool` for command execution

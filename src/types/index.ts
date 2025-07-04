@@ -70,5 +70,13 @@ export interface MusicOptions {
   mood?: string;  // Allow custom moods from config
 }
 
+export interface MemoryOptions {
+  action: 'set' | 'get' | 'list' | 'delete' | 'search' | 'clear';
+  key?: string;
+  value?: string;
+  tags?: string[];
+  pattern?: string;  // for search
+}
+
 // Re-export the CallToolResult type from MCP SDK for convenience
 export type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';

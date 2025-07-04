@@ -10,6 +10,7 @@ import { runTests } from './tools/runTests.js';
 import { runLinter } from './tools/runLinter.js';
 import { notify } from './tools/notify.js';
 import { music } from './tools/music.js';
+import { memory } from './tools/memory.js';
 
 dotenv.config();
 
@@ -121,6 +122,22 @@ server.registerTool(
   async (args) => music(args)
 );
 
+// Register memory tool
+server.registerTool(
+  'memory',
+  {
+    description: 'Store and retrieve temporary key-value pairs in memory (data is lost on MCP server restart)',
+    inputSchema: {
+      action: z.enum(['set', 'get', 'list', 'delete', 'search', 'clear']).describe('Memory operation to perform'),
+      key: z.string().optional().describe('Key for the memory entry'),
+      value: z.string().optional().describe('Value to store (required for set action)'),
+      tags: z.array(z.string()).optional().describe('Tags for categorization'),
+      pattern: z.string().optional().describe('Search pattern (for search action)'),
+    },
+  },
+  (args) => Promise.resolve(memory(args))
+);
+
 async function main(): Promise<void> {
   // Check if running in doctor mode
   const args = process.argv.slice(2);
@@ -149,6 +166,7 @@ async function main(): Promise<void> {
       console.log('   - run_linter: Run project linter');
       console.log('   - notify: Audio notifications (macOS only)');
       console.log('   - music: Control Spotify playback (macOS only)');
+      console.log('   - memory: Temporary key-value storage (in-memory)');
       
       console.log('\n✨ All systems operational!');
       process.exit(0);

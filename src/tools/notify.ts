@@ -3,6 +3,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { BaseExecTool } from './exec-base.js';
 import { createSuccessResult } from './base.js';
 import { platform } from 'os';
+import { isSpotifyPlaying, pauseSpotify, resumeSpotify } from './music.js';
 
 class NotifyTool extends BaseExecTool<NotificationOptions> {
   protected getActionName(): string {
@@ -64,8 +65,23 @@ class NotifyTool extends BaseExecTool<NotificationOptions> {
       return createSuccessResult('Notification displayed in console (audio not available on this platform)');
     }
     
-    // For macOS, use the parent class execution
-    return super.execute(args);
+    // Check if Spotify is playing and pause it
+    const wasPlaying = await isSpotifyPlaying();
+    if (wasPlaying) {
+      await pauseSpotify();
+    }
+    
+    // Execute the notification
+    const result = await super.execute(args);
+    
+    // Resume Spotify if it was playing
+    if (wasPlaying) {
+      // Add a small delay to ensure the notification finishes speaking
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      await resumeSpotify();
+    }
+    
+    return result;
   }
 }
 
