@@ -33,5 +33,19 @@ export interface LinterOptions {
   files?: string[];
 }
 
+export interface NotificationOptions {
+  message: string;
+  type?: 'question' | 'alert' | 'confirmation' | 'info';
+  voice?: string;
+  rate?: number;
+}
+
+export interface MusicOptions {
+  action: 'play' | 'pause' | 'playpause' | 'next' | 'previous' | 'volume' | 'mute' | 'info';
+  uri?: string;  // Spotify URI or search term
+  volume?: number;  // 0-100
+  mood?: 'focus' | 'relax' | 'energize' | 'chill' | 'work';
+}
+
 // Re-export the CallToolResult type from MCP SDK for convenience
 export type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';

@@ -8,6 +8,8 @@ import { reviewSpec } from './tools/reviewSpec.js';
 import { reviewCode } from './tools/reviewCode.js';
 import { runTests } from './tools/runTests.js';
 import { runLinter } from './tools/runLinter.js';
+import { notify } from './tools/notify.js';
+import { music } from './tools/music.js';
 
 dotenv.config();
 
@@ -89,6 +91,36 @@ server.registerTool(
   async (args) => runLinter(args)
 );
 
+// Register notify tool
+server.registerTool(
+  'notify',
+  {
+    description: 'Provide audio notifications to users (macOS only)',
+    inputSchema: {
+      message: z.string().describe('The message to speak'),
+      type: z.enum(['question', 'alert', 'confirmation', 'info']).optional().default('info').describe('Type of notification'),
+      voice: z.string().optional().describe('Voice to use for speech (e.g., "Daniel", "Samantha")'),
+      rate: z.number().optional().describe('Speaking rate in words per minute'),
+    },
+  },
+  async (args) => notify(args)
+);
+
+// Register music tool
+server.registerTool(
+  'music',
+  {
+    description: 'Control Spotify for background music (macOS only)',
+    inputSchema: {
+      action: z.enum(['play', 'pause', 'playpause', 'next', 'previous', 'volume', 'mute', 'info']).describe('Music control action'),
+      uri: z.string().optional().describe('Spotify URI or search term'),
+      volume: z.number().min(0).max(100).optional().describe('Volume level (0-100)'),
+      mood: z.enum(['focus', 'relax', 'energize', 'chill', 'work']).optional().describe('Mood-based playlist selection'),
+    },
+  },
+  async (args) => music(args)
+);
+
 async function main(): Promise<void> {
   // Check if running in doctor mode
   const args = process.argv.slice(2);
@@ -115,6 +147,8 @@ async function main(): Promise<void> {
       console.log('   - review_code: Review code changes');
       console.log('   - run_tests: Run project tests');
       console.log('   - run_linter: Run project linter');
+      console.log('   - notify: Audio notifications (macOS only)');
+      console.log('   - music: Control Spotify playback (macOS only)');
       
       console.log('\n✨ All systems operational!');
       process.exit(0);

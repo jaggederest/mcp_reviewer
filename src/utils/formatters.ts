@@ -7,11 +7,13 @@ export interface FormatSection {
 export function formatSections(sections: FormatSection[]): string {
   return sections
     .map(section => {
-      const header = `=== ${section.title} ===`;
-      const separator = '='.repeat(header.length);
-      return `${separator}\n${header}\n${separator}\n\n${section.content}`;
+      const emoji = section.type === 'error' ? '❌' : 
+                    section.type === 'success' ? '✅' :
+                    section.type === 'warning' ? '⚠️' : 
+                    section.type === 'info' ? 'ℹ️' : '📋';
+      return `${emoji} ${section.title}: ${section.content.replace(/\n/g, ' ')}`;
     })
-    .join('\n\n');
+    .join(' | ');
 }
 
 export function formatStatus(exitCode: number, successMessage: string, failureMessage: string): string {
@@ -26,32 +28,24 @@ export function formatExecOutput(
   exitCode: number,
   actionName: string
 ): string {
-  const sections: FormatSection[] = [];
-
-  if (output.trim()) {
-    sections.push({
-      title: 'Output',
-      content: output.trim(),
-    });
+  const parts: string[] = [];
+  
+  if (exitCode === 0) {
+    parts.push(`✅ ${actionName}: Success`);
+    if (output.trim()) {
+      // Take first line or first 80 chars of output
+      const firstLine = output.trim().split('\n')[0];
+      const truncated = firstLine.length > 80 ? firstLine.substring(0, 77) + '...' : firstLine;
+      parts.push(truncated);
+    }
+  } else {
+    parts.push(`❌ ${actionName}: Failed (exit ${exitCode})`);
+    if (error?.trim()) {
+      const firstLine = error.trim().split('\n')[0];
+      const truncated = firstLine.length > 80 ? firstLine.substring(0, 77) + '...' : firstLine;
+      parts.push(truncated);
+    }
   }
-
-  if (error?.trim()) {
-    sections.push({
-      title: 'Errors',
-      content: error.trim(),
-      type: 'error',
-    });
-  }
-
-  sections.push({
-    title: 'Status',
-    content: formatStatus(
-      exitCode,
-      `${actionName} completed successfully`,
-      `${actionName} failed with exit code ${exitCode}`
-    ),
-    type: exitCode === 0 ? 'success' : 'error',
-  });
-
-  return formatSections(sections);
+  
+  return parts.join(' | ');
 }
