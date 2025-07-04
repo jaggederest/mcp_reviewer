@@ -2,7 +2,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { createErrorResult, createSuccessResult } from './base.js';
-import { formatExecOutput } from '../utils/formatters.js';
+import { formatExecResult } from '../utils/formatters.js';
 
 const execAsync = promisify(exec);
 
@@ -33,7 +33,7 @@ export abstract class BaseExecTool<T = unknown> {
         exitCode = err.code ?? 1;
       }
 
-      const formattedOutput = formatExecOutput(output, error, exitCode, this.getActionName());
+      const formattedOutput = formatExecResult(output, error, exitCode, this.getActionName());
       return createSuccessResult(formattedOutput);
     } catch (error) {
       return createErrorResult(this.getActionName(), error);
