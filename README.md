@@ -129,8 +129,11 @@ npm test
 # Run unit tests only
 npm run test:unit
 
-# Run integration tests
+# Run integration tests (requires Ollama)
 npm run test:integration
+
+# Run basic integration tests (no AI required)
+npm run test:integration:basic
 
 # Type checking
 npm run typecheck
@@ -138,6 +141,24 @@ npm run typecheck
 # Linting
 npm run lint
 ```
+
+### End-to-End Testing
+
+The project includes a comprehensive e2e test that validates the full workflow using a real Ollama instance:
+
+1. Install and start Ollama: https://ollama.ai
+2. Pull a model: `ollama pull llama2`
+3. Run the test: `npm run test:e2e`
+
+The e2e test demonstrates:
+- Specification generation
+- Specification review
+- Code creation
+- Code review
+- Linting
+- Test execution
+
+All using real AI responses from your local Ollama instance.
 
 ## License
 
