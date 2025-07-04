@@ -8,7 +8,7 @@ const execAsync = promisify(exec);
 
 export abstract class BaseExecTool<T = unknown> {
   protected abstract getActionName(): string;
-  protected abstract buildCommand(args: T): Promise<string>;
+  protected abstract buildCommand(args: T): Promise<string> | string;
   
   async execute(args: T): Promise<CallToolResult> {
     try {
