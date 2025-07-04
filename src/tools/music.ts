@@ -1,7 +1,8 @@
-import { MusicOptions } from '../types/index.js';
+import { MusicOptions, MusicPlaylist } from '../types/index.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { BaseExecTool } from './exec-base.js';
 import { createSuccessResult, createErrorResult } from './base.js';
+import { loadProjectConfig } from '../utils/config.js';
 import { platform } from 'os';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -13,8 +14,8 @@ const execAsync = promisify(exec);
 // For example, for unsafe volume increases, we ask users to explicitly confirm
 // by re-running the command with additional parameters or adjusted values.
 
-// Mood-based Spotify playlist URIs
-const MOOD_PLAYLISTS: Record<string, { uri: string; name: string }> = {
+// Default mood-based Spotify playlist URIs (fallback if no config)
+const DEFAULT_MOOD_PLAYLISTS: Record<string, MusicPlaylist> = {
   focus: {
     uri: 'spotify:playlist:37i9dQZF1DWZeKCadgRdKQ',
     name: 'Deep Focus'
@@ -38,6 +39,54 @@ const MOOD_PLAYLISTS: Record<string, { uri: string; name: string }> = {
 };
 
 class MusicTool extends BaseExecTool<MusicOptions> {
+  private playlists: Record<string, MusicPlaylist> | null = null;
+  private safeVolume: number | null = null;
+  private volumeIncrement: number | null = null;
+  
+  private async loadPlaylists(): Promise<Record<string, MusicPlaylist>> {
+    if (this.playlists) {
+      return this.playlists;
+    }
+    
+    try {
+      const config = await loadProjectConfig();
+      if (config.music?.playlists) {
+        // Merge configured playlists with defaults, filtering out undefined values
+        const configuredPlaylists: Record<string, MusicPlaylist> = {};
+        for (const [key, value] of Object.entries(config.music.playlists)) {
+          if (value) {
+            configuredPlaylists[key] = value;
+          }
+        }
+        // Merge with defaults
+        this.playlists = { ...DEFAULT_MOOD_PLAYLISTS, ...configuredPlaylists };
+      } else {
+        this.playlists = DEFAULT_MOOD_PLAYLISTS;
+      }
+      this.safeVolume = config.music?.safeVolume ?? 70;
+      this.volumeIncrement = config.music?.volumeIncrement ?? 20;
+      return this.playlists;
+    } catch {
+      this.playlists = DEFAULT_MOOD_PLAYLISTS;
+      this.safeVolume = 70;
+      this.volumeIncrement = 20;
+      return this.playlists;
+    }
+  }
+  
+  private async getSafeVolume(): Promise<number> {
+    if (this.safeVolume === null) {
+      await this.loadPlaylists();
+    }
+    return this.safeVolume ?? 70;
+  }
+  
+  private async getVolumeIncrement(): Promise<number> {
+    if (this.volumeIncrement === null) {
+      await this.loadPlaylists();
+    }
+    return this.volumeIncrement ?? 20;
+  }
   protected getActionName(): string {
     return 'Music Control';
   }
@@ -88,7 +137,7 @@ class MusicTool extends BaseExecTool<MusicOptions> {
     }
   }
 
-  protected buildCommand(args: MusicOptions): string {
+  protected async buildCommand(args: MusicOptions): Promise<string> {
     // Only support macOS for now
     if (platform() !== 'darwin') {
       throw new Error('Music control is only available on macOS');
@@ -101,7 +150,11 @@ class MusicTool extends BaseExecTool<MusicOptions> {
       case 'play':
         if (mood) {
           // Play mood-based playlist
-          const playlist = MOOD_PLAYLISTS[mood];
+          const playlists = await this.loadPlaylists();
+          if (!(mood in playlists)) {
+            throw new Error(`Unknown mood: ${mood}. Available moods: ${Object.keys(playlists).join(', ')}`);
+          }
+          const playlist = playlists[mood];
           return `osascript -e 'tell application "Spotify" to play track "${playlist.uri}"'`;
         } else if (uri !== undefined) {
           // Play specific URI or search
@@ -200,8 +253,8 @@ class MusicTool extends BaseExecTool<MusicOptions> {
       // Safety check: Volume protection
       if (args.action === 'volume' && args.volume !== undefined && spotifyRunning) {
         const currentVolume = await this.getCurrentSpotifyVolume();
-        const MAX_SAFE_VOLUME = 70; // Maximum safe volume unless explicitly requested
-        const GRADUAL_INCREASE_LIMIT = 20; // Maximum volume increase in one step
+        const MAX_SAFE_VOLUME = await this.getSafeVolume();
+        const GRADUAL_INCREASE_LIMIT = await this.getVolumeIncrement();
         
         // If trying to increase volume
         if (args.volume > currentVolume) {
@@ -245,8 +298,12 @@ class MusicTool extends BaseExecTool<MusicOptions> {
       }
       
       if (args.action === 'play' && args.mood) {
-        const playlist = MOOD_PLAYLISTS[args.mood];
-        return createSuccessResult(`Playing ${playlist.name} playlist for ${args.mood} mood`);
+        const playlists = await this.loadPlaylists();
+        if (args.mood in playlists) {
+          const playlist = playlists[args.mood];
+          return createSuccessResult(`Playing ${playlist.name} playlist for ${args.mood} mood`);
+        }
+        return result;
       } else if (args.action === 'volume' && args.volume !== undefined) {
         const newVolume = Math.min(args.volume, 100);
         return createSuccessResult(`Volume set to ${newVolume}% (hearing protection active)`);

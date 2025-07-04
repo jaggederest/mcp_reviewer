@@ -1,3 +1,25 @@
+export interface MusicPlaylist {
+  uri: string;  // Spotify URI or search term
+  name: string;
+  description?: string;
+}
+
+export interface MusicConfig {
+  playlists?: {
+    focus?: MusicPlaylist;
+    relax?: MusicPlaylist;
+    energize?: MusicPlaylist;
+    chill?: MusicPlaylist;
+    work?: MusicPlaylist;
+    [key: string]: MusicPlaylist | undefined;  // Allow custom moods
+  };
+  defaultMood?: string;
+  safeVolume?: number;  // Default: 70
+  volumeIncrement?: number;  // Default: 20
+  shuffle?: boolean;
+  repeat?: boolean;
+}
+
 export interface ProjectConfig {
   testCommand?: string;
   lintCommand?: string;
@@ -5,6 +27,7 @@ export interface ProjectConfig {
   aiProvider?: 'openai' | 'ollama';
   ollamaBaseUrl?: string;
   ollamaModel?: string;
+  music?: MusicConfig;
 }
 
 export interface SpecGenerationOptions {
@@ -44,7 +67,7 @@ export interface MusicOptions {
   action: 'play' | 'pause' | 'playpause' | 'next' | 'previous' | 'volume' | 'mute' | 'info';
   uri?: string;  // Spotify URI or search term
   volume?: number;  // 0-100
-  mood?: 'focus' | 'relax' | 'energize' | 'chill' | 'work';
+  mood?: string;  // Allow custom moods from config
 }
 
 // Re-export the CallToolResult type from MCP SDK for convenience

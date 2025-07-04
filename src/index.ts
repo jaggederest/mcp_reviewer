@@ -115,7 +115,7 @@ server.registerTool(
       action: z.enum(['play', 'pause', 'playpause', 'next', 'previous', 'volume', 'mute', 'info']).describe('Music control action'),
       uri: z.string().optional().describe('Spotify URI or search term'),
       volume: z.number().min(0).max(100).optional().describe('Volume level (0-100)'),
-      mood: z.enum(['focus', 'relax', 'energize', 'chill', 'work']).optional().describe('Mood-based playlist selection'),
+      mood: z.string().optional().describe('Mood-based playlist selection (focus, relax, energize, chill, work, or custom)'),
     },
   },
   async (args) => music(args)
