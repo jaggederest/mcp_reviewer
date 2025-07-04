@@ -1,7 +1,8 @@
-import { SpecGenerationOptions, ToolResult } from '../types/index.js';
+import { SpecGenerationOptions } from '../types/index.js';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { callOpenAI } from '../utils/openai.js';
 
-export async function generateSpec(args: SpecGenerationOptions): Promise<ToolResult> {
+export async function generateSpec(args: SpecGenerationOptions): Promise<CallToolResult> {
   const { prompt, context, format = 'markdown' } = args;
   
   const systemPrompt = `You are a technical specification writer. Generate detailed, clear, and actionable specifications based on the requirements provided. 

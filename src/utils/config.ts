@@ -2,14 +2,16 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { ProjectConfig } from '../types/index.js';
 
-const DEFAULT_CONFIG: ProjectConfig = {
-  testCommand: 'npm test',
-  lintCommand: 'npm run lint',
-  buildCommand: 'npm run build',
-  openaiModel: process.env.OPENAI_MODEL ?? 'o1-preview',
-};
-
 let cachedConfig: ProjectConfig | null = null;
+
+function getDefaultConfig(): ProjectConfig {
+  return {
+    testCommand: 'npm test',
+    lintCommand: 'npm run lint',
+    buildCommand: 'npm run build',
+    openaiModel: process.env.OPENAI_MODEL ?? 'o1-preview',
+  };
+}
 
 export async function loadProjectConfig(): Promise<ProjectConfig> {
   if (cachedConfig) {
@@ -22,14 +24,14 @@ export async function loadProjectConfig(): Promise<ProjectConfig> {
     const userConfig = JSON.parse(configData) as ProjectConfig;
     
     cachedConfig = {
-      ...DEFAULT_CONFIG,
+      ...getDefaultConfig(),
       ...userConfig,
     };
     
     return cachedConfig;
   } catch {
-    cachedConfig = DEFAULT_CONFIG;
-    return DEFAULT_CONFIG;
+    cachedConfig = getDefaultConfig();
+    return cachedConfig;
   }
 }
 
@@ -39,4 +41,9 @@ export function getOpenAIKey(): string {
     throw new Error('OPENAI_API_KEY environment variable is not set');
   }
   return apiKey;
+}
+
+// For testing purposes only
+export function resetConfigCache(): void {
+  cachedConfig = null;
 }

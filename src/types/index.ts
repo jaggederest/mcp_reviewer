@@ -34,9 +34,5 @@ export interface LinterOptions {
   files?: string[];
 }
 
-export interface ToolResult {
-  content: Array<{
-    type: 'text';
-    text: string;
-  }>;
-}
+// Re-export the CallToolResult type from MCP SDK for convenience
+export type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';

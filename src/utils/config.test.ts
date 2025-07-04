@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { readFile } from 'fs/promises';
-import { loadProjectConfig, getOpenAIKey } from './config.js';
+import { loadProjectConfig, getOpenAIKey, resetConfigCache } from './config.js';
 
 vi.mock('fs/promises');
 
 describe('config utilities', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.resetModules();
+    resetConfigCache();
     delete process.env.OPENAI_API_KEY;
     delete process.env.OPENAI_MODEL;
   });

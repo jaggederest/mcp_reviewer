@@ -1,7 +1,8 @@
-import { SpecReviewOptions, ToolResult } from '../types/index.js';
+import { SpecReviewOptions } from '../types/index.js';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { callOpenAI } from '../utils/openai.js';
 
-export async function reviewSpec(args: SpecReviewOptions): Promise<ToolResult> {
+export async function reviewSpec(args: SpecReviewOptions): Promise<CallToolResult> {
   const { spec, focusAreas = [] } = args;
   
   const systemPrompt = `You are a critical technical reviewer specializing in specification analysis. Review the provided specification and provide constructive, critical feedback.

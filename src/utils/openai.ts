@@ -4,11 +4,9 @@ import { getOpenAIKey, loadProjectConfig } from './config.js';
 let openaiClient: OpenAI | null = null;
 
 export function getOpenAIClient(): OpenAI {
-  if (!openaiClient) {
-    openaiClient = new OpenAI({
-      apiKey: getOpenAIKey(),
-    });
-  }
+  openaiClient ??= new OpenAI({
+    apiKey: getOpenAIKey(),
+  });
   return openaiClient;
 }
 
