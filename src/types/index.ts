@@ -39,6 +39,7 @@ export interface SpecGenerationOptions {
 export interface SpecReviewOptions {
   spec: string;
   focusAreas?: string[];
+  projectContext?: string; // e.g., "MVP", "learning project", "production API"
 }
 
 export interface CodeReviewOptions {

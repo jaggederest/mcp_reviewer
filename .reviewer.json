@@ -1,7 +1,6 @@
 {
   "testCommand": "npm test",
   "lintCommand": "npm run lint",
-  "aiProvider": "ollama",
-  "ollamaModel": "tinyllama",
-  "ollamaBaseUrl": "http://localhost:11434"
+  "aiProvider": "openai",
+  "openaiModel": "o3"
 }
