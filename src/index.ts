@@ -133,9 +133,10 @@ server.registerTool(
       value: z.string().optional().describe('Value to store (required for set action)'),
       tags: z.array(z.string()).optional().describe('Tags for categorization'),
       pattern: z.string().optional().describe('Search pattern (for search action)'),
+      persist: z.boolean().optional().describe('Save to disk (for set action)'),
     },
   },
-  (args) => Promise.resolve(memory(args))
+  async (args) => memory(args)
 );
 
 async function main(): Promise<void> {

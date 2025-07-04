@@ -1,6 +1,8 @@
 import { MemoryOptions } from '../types/index.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { createSuccessResult, createErrorResult } from './base.js';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 interface MemoryEntry {
   value: string;
@@ -11,16 +13,57 @@ interface MemoryEntry {
 // Module-level storage that persists across tool invocations during MCP server lifetime
 const memoryStore = new Map<string, MemoryEntry>();
 const MAX_ENTRIES = 1000;
+const MEMORY_DIR = '.claude/memories';
+
+// Sanitize key to be filesystem-safe
+function sanitizeKey(key: string): string {
+  return key.replace(/[\/\\:*?"<>|]/g, '_').substring(0, 200);
+}
+
+// Load persisted memories from disk on startup
+async function loadPersistedMemories(): Promise<void> {
+  try {
+    const files = await fs.readdir(MEMORY_DIR);
+    
+    for (const file of files) {
+      if (file.endsWith('.txt')) {
+        const key = file.slice(0, -4); // Remove .txt extension
+        const valuePath = path.join(MEMORY_DIR, file);
+        const value = await fs.readFile(valuePath, 'utf8');
+        
+        // Try to load metadata
+        let tags: string[] = [];
+        let created = new Date();
+        try {
+          const metaPath = path.join(MEMORY_DIR, `${key}.meta`);
+          const metaContent = await fs.readFile(metaPath, 'utf8');
+          const meta = JSON.parse(metaContent);
+          tags = meta.tags || [];
+          created = new Date(meta.created);
+        } catch {
+          // No metadata or invalid JSON - use defaults
+        }
+        
+        memoryStore.set(key, { value, created, tags });
+      }
+    }
+  } catch {
+    // Directory doesn't exist yet - that's fine
+  }
+}
+
+// Load memories immediately
+loadPersistedMemories().catch(console.error);
 
 // TODO: Add 'summary' action to show key-value pairs with values truncated to 100 characters
 // Format: ✅ Memory Summary: key1="value..." [tag1,tag2] | key2="value..." [tag3]
 
 class MemoryTool {
-  execute(args: MemoryOptions): CallToolResult {
+  async execute(args: MemoryOptions): Promise<CallToolResult> {
     try {
       switch (args.action) {
         case 'set':
-          return this.setMemory(args);
+          return await this.setMemory(args);
         case 'get':
           return this.getMemory(args);
         case 'list':
@@ -39,7 +82,7 @@ class MemoryTool {
     }
   }
 
-  private setMemory(args: MemoryOptions): CallToolResult {
+  private async setMemory(args: MemoryOptions): Promise<CallToolResult> {
     if (!args.key || !args.value) {
       return createErrorResult('Memory', 'Both key and value are required for set action');
     }
@@ -53,6 +96,30 @@ class MemoryTool {
       created: new Date(),
       tags: args.tags ?? []
     });
+
+    // Persist to disk if requested
+    if (args.persist) {
+      try {
+        await fs.mkdir(MEMORY_DIR, { recursive: true });
+        
+        const sanitized = sanitizeKey(args.key);
+        const valuePath = path.join(MEMORY_DIR, `${sanitized}.txt`);
+        const metaPath = path.join(MEMORY_DIR, `${sanitized}.meta`);
+        
+        // Write value
+        await fs.writeFile(valuePath, args.value, 'utf8');
+        
+        // Write metadata
+        const metadata = {
+          created: new Date().toISOString(),
+          tags: args.tags ?? []
+        };
+        await fs.writeFile(metaPath, JSON.stringify(metadata, null, 2), 'utf8');
+      } catch (error) {
+        console.error('Failed to persist memory:', error);
+        // Continue - memory is still in RAM
+      }
+    }
 
     return createSuccessResult(`✅ Memory: Set '${args.key}' = '${args.value.substring(0, 50)}${args.value.length > 50 ? '...' : ''}'`);
   }
@@ -138,4 +205,4 @@ class MemoryTool {
 }
 
 const tool = new MemoryTool();
-export const memory = (args: MemoryOptions): CallToolResult => tool.execute(args);
+export const memory = (args: MemoryOptions): Promise<CallToolResult> => tool.execute(args);

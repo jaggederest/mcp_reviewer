@@ -77,6 +77,7 @@ export interface MemoryOptions {
   value?: string;
   tags?: string[];
   pattern?: string;  // for search
+  persist?: boolean; // for set action - saves to disk
 }
 
 // Re-export the CallToolResult type from MCP SDK for convenience
