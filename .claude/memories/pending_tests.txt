@@ -1,0 +1,1 @@
+Add unit tests for NotifyTool and MusicTool - Copilot review from PR #3 suggested these tools lack dedicated test coverage. Tests should cover: NotifyTool's buildCommand logic and execute behavior on macOS/non-macOS platforms; MusicTool's playlist loading, safety checks, and command generation for each action.
