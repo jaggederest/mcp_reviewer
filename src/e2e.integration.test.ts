@@ -66,8 +66,10 @@ describe('End-to-End MCP Workflow with Ollama', () => {
       return;
     }
 
-    // Use the first available model
-    const modelToUse = models.find(m => m.includes('llama2') || m.includes('codellama')) || models[0];
+    // Use TinyLlama if available, otherwise use the first available model
+    const modelToUse = models.find(m => m.includes('tinyllama')) || 
+                      models.find(m => m.includes('llama2') || m.includes('codellama')) || 
+                      models[0];
 
     const transport = new StdioClientTransport({
       command: 'npx',
@@ -220,5 +222,5 @@ console.log(\`Hello, \${name}!\`);
     } finally {
       await client.close();
     }
-  }, 60000); // 60 second timeout for Ollama operations
+  }, 120000); // 120 second timeout for Ollama operations
 });
