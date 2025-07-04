@@ -9,6 +9,8 @@ This is an MCP (Model Context Protocol) service called "reviewer-mcp" that provi
 3. **Code Review**: Analyze code changes with focus on security, performance, style, or logic
 4. **Test Runner**: Standardized test execution with consistent output formatting
 5. **Linter**: Standardized linting with consistent output formatting
+6. **Music Control**: Spotify integration with configurable playlists and safety features (macOS only)
+7. **Notifications**: Audio notifications for alerts and status updates (macOS only)
 
 ## Architecture
 - **Base Classes**: `BaseAITool` for AI-powered tools, `BaseExecTool` for command execution
@@ -25,7 +27,11 @@ This is an MCP (Model Context Protocol) service called "reviewer-mcp" that provi
 - ESLint with TypeScript rules
 
 ## Development Guidelines
-- Always run `npm run typecheck`, `npm run lint`, and `npm test` before committing
+- **IMPORTANT**: Use MCP tools for testing and linting - DO NOT run these commands manually via bash:
+  - Use `mcp__reviewer__run_tests` for running tests
+  - Use `mcp__reviewer__run_linter` for linting
+  - TypeScript checking can still be done manually
+- Always verify code quality before committing using the MCP tools
 - Maintain strict TypeScript types - no `any` types allowed
 - Follow existing code patterns and conventions
 - Test all new functionality with unit tests
@@ -40,7 +46,18 @@ The service supports project-specific configuration via `.reviewer.json`:
   "aiProvider": "ollama",
   "ollamaModel": "tinyllama",
   "ollamaBaseUrl": "http://localhost:11434",
-  "openaiModel": "o1-preview"
+  "openaiModel": "o1-preview",
+  "music": {
+    "playlists": {
+      "focus": {
+        "uri": "spotify:playlist:37i9dQZF1DWZeKCadgRdKQ",
+        "name": "Classical Focus",
+        "description": "Classical pieces for deep concentration"
+      }
+    },
+    "safeVolume": 70,
+    "volumeIncrement": 20
+  }
 }
 ```
 
