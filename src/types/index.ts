@@ -3,6 +3,9 @@ export interface ProjectConfig {
   lintCommand?: string;
   buildCommand?: string;
   openaiModel?: string;
+  aiProvider?: 'openai' | 'ollama';
+  ollamaBaseUrl?: string;
+  ollamaModel?: string;
 }
 
 export interface SpecGenerationOptions {

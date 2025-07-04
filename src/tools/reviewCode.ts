@@ -1,6 +1,6 @@
 import { CodeReviewOptions } from '../types/index.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { callOpenAI } from '../utils/openai.js';
+import { callAI } from '../utils/ai.js';
 
 export async function reviewCode(args: CodeReviewOptions): Promise<CallToolResult> {
   const { diff, context, reviewType = 'all' } = args;
@@ -27,7 +27,7 @@ Be constructive but thorough in identifying potential issues.`;
   const userPrompt = `Review these code changes:\n\n${diff}${context ? `\n\nContext: ${context}` : ''}`;
   
   try {
-    const result = await callOpenAI(systemPrompt, userPrompt);
+    const result = await callAI(systemPrompt, userPrompt);
     
     return {
       content: [{

@@ -10,7 +10,9 @@
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "CI=true vitest run --bail=1"
+    "test": "CI=true vitest run --bail=1",
+    "test:unit": "CI=true vitest run --bail=1 --exclude=**/*.integration.test.ts",
+    "test:integration": "CI=true vitest run --bail=1 **/*.integration.test.ts"
   },
   "keywords": ["mcp", "ai", "openai", "code-review", "development"],
   "author": "",

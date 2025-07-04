@@ -23,6 +23,9 @@ describe('config utilities', () => {
         lintCommand: 'npm run lint',
         buildCommand: 'npm run build',
         openaiModel: 'o1-preview',
+        aiProvider: 'openai',
+        ollamaBaseUrl: 'http://localhost:11434',
+        ollamaModel: 'llama2',
       });
     });
 
@@ -41,6 +44,9 @@ describe('config utilities', () => {
         lintCommand: 'npm run lint',
         buildCommand: 'npm run build',
         openaiModel: 'gpt-4',
+        aiProvider: 'openai',
+        ollamaBaseUrl: 'http://localhost:11434',
+        ollamaModel: 'llama2',
       });
     });
 

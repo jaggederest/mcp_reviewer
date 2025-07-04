@@ -1,6 +1,6 @@
 import { SpecGenerationOptions } from '../types/index.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { callOpenAI } from '../utils/openai.js';
+import { callAI } from '../utils/ai.js';
 
 export async function generateSpec(args: SpecGenerationOptions): Promise<CallToolResult> {
   const { prompt, context, format = 'markdown' } = args;
@@ -18,7 +18,7 @@ Focus on:
   const userPrompt = `Generate a specification for: ${prompt}${context ? `\n\nAdditional context: ${context}` : ''}`;
   
   try {
-    const result = await callOpenAI(systemPrompt, userPrompt);
+    const result = await callAI(systemPrompt, userPrompt);
     
     return {
       content: [{

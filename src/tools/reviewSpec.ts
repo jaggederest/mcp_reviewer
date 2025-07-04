@@ -1,6 +1,6 @@
 import { SpecReviewOptions } from '../types/index.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { callOpenAI } from '../utils/openai.js';
+import { callAI } from '../utils/ai.js';
 
 export async function reviewSpec(args: SpecReviewOptions): Promise<CallToolResult> {
   const { spec, focusAreas = [] } = args;
@@ -20,7 +20,7 @@ Be direct and specific in your feedback. Point out both strengths and weaknesses
   const userPrompt = `Review this specification:\n\n${spec}`;
   
   try {
-    const result = await callOpenAI(systemPrompt, userPrompt);
+    const result = await callAI(systemPrompt, userPrompt);
     
     return {
       content: [{

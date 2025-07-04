@@ -10,6 +10,9 @@ function getDefaultConfig(): ProjectConfig {
     lintCommand: 'npm run lint',
     buildCommand: 'npm run build',
     openaiModel: process.env.OPENAI_MODEL ?? 'o1-preview',
+    aiProvider: (process.env.AI_PROVIDER as 'openai' | 'ollama' | undefined) ?? 'openai',
+    ollamaBaseUrl: process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434',
+    ollamaModel: process.env.OLLAMA_MODEL ?? 'llama2',
   };
 }
 
