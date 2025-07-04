@@ -132,9 +132,6 @@ npm run test:unit
 # Run integration tests (requires Ollama)
 npm run test:integration
 
-# Run basic integration tests (no AI required)
-npm run test:integration:basic
-
 # Type checking
 npm run typecheck
 

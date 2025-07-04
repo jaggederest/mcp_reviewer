@@ -13,7 +13,6 @@
     "test": "CI=true vitest run --bail=1",
     "test:unit": "CI=true vitest run --bail=1 --exclude=**/*.integration.test.ts",
     "test:integration": "./scripts/test-e2e.sh",
-    "test:integration:basic": "CI=true vitest run --bail=1 src/server.integration.test.ts",
     "test:coverage": "CI=true vitest run --coverage --exclude=**/*.integration.test.ts",
     "test:coverage:all": "CI=true vitest run --coverage"
   },
