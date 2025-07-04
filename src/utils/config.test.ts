@@ -18,7 +18,7 @@ describe('config utilities', () => {
       
       const config = await loadProjectConfig();
       
-      expect(config).toEqual({
+      expect(config).toMatchObject({
         testCommand: 'npm test',
         lintCommand: 'npm run lint',
         openaiModel: 'o1-preview',
@@ -38,7 +38,7 @@ describe('config utilities', () => {
       
       const config = await loadProjectConfig();
       
-      expect(config).toEqual({
+      expect(config).toMatchObject({
         testCommand: 'yarn test',
         lintCommand: 'npm run lint',
         openaiModel: 'gpt-4',

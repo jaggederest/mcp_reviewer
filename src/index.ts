@@ -8,6 +8,9 @@ import { reviewSpec } from './tools/reviewSpec.js';
 import { reviewCode } from './tools/reviewCode.js';
 import { runTests } from './tools/runTests.js';
 import { runLinter } from './tools/runLinter.js';
+import { notify } from './tools/notify.js';
+import { music } from './tools/music.js';
+import { memory } from './tools/memory.js';
 
 dotenv.config();
 
@@ -58,7 +61,6 @@ server.registerTool(
     inputSchema: {
       diff: z.string().describe('Git diff or code changes to review'),
       context: z.string().optional().describe('Context about the changes'),
-      reviewType: z.enum(['security', 'performance', 'style', 'logic', 'all']).optional().default('all').describe('Type of review to perform'),
     },
   },
   async (args) => reviewCode(args)
@@ -89,6 +91,53 @@ server.registerTool(
   async (args) => runLinter(args)
 );
 
+// Register notify tool
+server.registerTool(
+  'notify',
+  {
+    description: 'Provide audio notifications to users (macOS only)',
+    inputSchema: {
+      message: z.string().describe('The message to speak'),
+      type: z.enum(['question', 'alert', 'confirmation', 'info']).optional().default('info').describe('Type of notification'),
+      voice: z.string().optional().describe('Voice to use for speech (e.g., "Daniel", "Samantha")'),
+      rate: z.number().optional().describe('Speaking rate in words per minute'),
+    },
+  },
+  async (args) => notify(args)
+);
+
+// Register music tool
+server.registerTool(
+  'music',
+  {
+    description: 'Control Spotify for background music (macOS only)',
+    inputSchema: {
+      action: z.enum(['play', 'pause', 'playpause', 'next', 'previous', 'volume', 'mute', 'info']).describe('Music control action'),
+      uri: z.string().optional().describe('Spotify URI or search term'),
+      volume: z.number().min(0).max(100).optional().describe('Volume level (0-100)'),
+      mood: z.string().optional().describe('Mood-based playlist selection (focus, relax, energize, chill, work, or custom)'),
+    },
+  },
+  async (args) => music(args)
+);
+
+// Register memory tool
+server.registerTool(
+  'memory',
+  {
+    description: 'Store and retrieve temporary key-value pairs in memory (data is lost on MCP server restart)',
+    inputSchema: {
+      action: z.enum(['set', 'get', 'list', 'delete', 'search', 'clear']).describe('Memory operation to perform'),
+      key: z.string().optional().describe('Key for the memory entry'),
+      value: z.string().optional().describe('Value to store (required for set action)'),
+      tags: z.array(z.string()).optional().describe('Tags for categorization'),
+      pattern: z.string().optional().describe('Search pattern (for search action)'),
+      persist: z.boolean().optional().describe('Save to disk (for set action)'),
+    },
+  },
+  async (args) => memory(args)
+);
+
 async function main(): Promise<void> {
   // Check if running in doctor mode
   const args = process.argv.slice(2);
@@ -115,6 +164,9 @@ async function main(): Promise<void> {
       console.log('   - review_code: Review code changes');
       console.log('   - run_tests: Run project tests');
       console.log('   - run_linter: Run project linter');
+      console.log('   - notify: Audio notifications (macOS only)');
+      console.log('   - music: Control Spotify playback (macOS only)');
+      console.log('   - memory: Temporary key-value storage (in-memory)');
       
       console.log('\n✨ All systems operational!');
       process.exit(0);

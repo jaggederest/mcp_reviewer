@@ -1,0 +1,1 @@
+Use mcp__reviewer__notify to alert the user when they need to restart the server after building changes. This provides audio feedback so they know when the build is complete.

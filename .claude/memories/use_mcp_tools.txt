@@ -1,0 +1,1 @@
+Always use the available MCP tools instead of bash commands for testing and linting. Use mcp__reviewer__run_tests for tests and mcp__reviewer__run_linter for linting.

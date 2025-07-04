@@ -1,0 +1,1 @@
+Use reviewType parameter in mcp__reviewer__review_code to focus reviews: 'security' for auth/data handling, 'performance' for optimization, 'style' for consistency, 'logic' for correctness, or 'all' for comprehensive review.
