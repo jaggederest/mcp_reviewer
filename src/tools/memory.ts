@@ -12,6 +12,9 @@ interface MemoryEntry {
 const memoryStore = new Map<string, MemoryEntry>();
 const MAX_ENTRIES = 1000;
 
+// TODO: Add 'summary' action to show key-value pairs with values truncated to 100 characters
+// Format: ✅ Memory Summary: key1="value..." [tag1,tag2] | key2="value..." [tag3]
+
 class MemoryTool {
   execute(args: MemoryOptions): CallToolResult {
     try {
