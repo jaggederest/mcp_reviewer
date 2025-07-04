@@ -77,15 +77,15 @@ describe('formatters', () => {
     });
     
     it('should truncate very large output', () => {
-      const hugeError = 'a'.repeat(200000); // 200KB
+      const hugeError = 'a'.repeat(20000); // 20KB
       const result = formatExecOutputFull('', hugeError, 1, 'Tests');
       
       // Should contain truncation message
       expect(result).toContain('[... truncated');
       expect(result).toContain('bytes ...]');
       
-      // Should be less than max size (100KB + overhead)
-      expect(result.length).toBeLessThan(110000);
+      // Should be less than max size (10KB + overhead)
+      expect(result.length).toBeLessThan(11000);
     });
     
     it('should prefer stderr over stdout', () => {

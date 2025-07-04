@@ -7,7 +7,7 @@ export interface FormatSection {
 // Strip ANSI escape codes for safety
 // eslint-disable-next-line no-control-regex
 const ANSI_REGEX = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
-const MAX_OUTPUT_SIZE = 100 * 1024; // 100KB limit
+const MAX_OUTPUT_SIZE = 10 * 1024; // 10KB limit
 
 // Helper to safely truncate large outputs
 function truncateOutput(text: string, maxSize: number = MAX_OUTPUT_SIZE): string {
