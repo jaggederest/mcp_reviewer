@@ -3,30 +3,40 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { BaseAITool } from './ai-base.js';
 
 class ReviewCodeTool extends BaseAITool<CodeReviewOptions> {
-  private readonly reviewFocus = {
-    security: 'Security vulnerabilities, input validation, authentication/authorization issues, data exposure risks',
-    performance: 'Performance bottlenecks, inefficient algorithms, memory leaks, unnecessary computations',
-    style: 'Code style consistency, naming conventions, code organization, readability',
-    logic: 'Business logic errors, edge cases, error handling, correctness of implementation',
-    all: 'All aspects including security, performance, code style, and logic',
-  };
-
   protected getActionName(): string {
     return 'reviewing code';
   }
 
-  protected getSystemPrompt(args: CodeReviewOptions): string {
-    const { reviewType = 'all' } = args;
-    return `You are an expert code reviewer. Review the provided code changes critically and provide actionable feedback.
-Focus on: ${this.reviewFocus[reviewType]}
+  protected getSystemPrompt(_args: CodeReviewOptions): string {
+    return `You are an expert code reviewer providing comprehensive, pragmatic feedback.
 
-Provide:
-- Specific line-by-line feedback where issues are found
-- Severity level for each issue (critical, major, minor)
-- Concrete suggestions for improvement
-- Recognition of good practices when present
+Review the code changes and provide feedback organized by priority:
 
-Be constructive but thorough in identifying potential issues.`;
+P0 (Critical - Must Fix):
+- Bugs that will cause runtime errors or incorrect behavior
+- Security vulnerabilities (SQL injection, XSS, auth bypass, etc.)
+- Data loss or corruption risks
+- Breaking changes to public APIs
+
+P1 (Important - Should Fix):
+- Performance problems (O(n²) algorithms, memory leaks, inefficient queries)
+- Poor error handling that could impact users
+- Code that is difficult to maintain or understand
+- Missing critical tests for core functionality
+
+P2 (Recommended - Nice to Have):
+- Code style and convention improvements
+- Opportunities for better abstraction or DRY
+- Minor performance optimizations
+- Additional test coverage for edge cases
+
+For each issue:
+- Specify the exact line or section
+- Explain why it's a problem
+- Provide a concrete fix or improvement suggestion
+
+Also acknowledge good patterns and practices when you see them.
+Keep feedback actionable and focused on real improvements, not nitpicks.`;
   }
 
   protected getUserPrompt(args: CodeReviewOptions): string {

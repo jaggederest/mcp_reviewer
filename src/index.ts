@@ -61,7 +61,6 @@ server.registerTool(
     inputSchema: {
       diff: z.string().describe('Git diff or code changes to review'),
       context: z.string().optional().describe('Context about the changes'),
-      reviewType: z.enum(['security', 'performance', 'style', 'logic', 'all']).optional().default('all').describe('Type of review to perform'),
     },
   },
   async (args) => reviewCode(args)

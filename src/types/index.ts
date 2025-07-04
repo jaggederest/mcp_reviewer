@@ -45,7 +45,6 @@ export interface SpecReviewOptions {
 export interface CodeReviewOptions {
   diff: string;
   context?: string;
-  reviewType?: 'security' | 'performance' | 'style' | 'logic' | 'all';
 }
 
 export interface TestRunnerOptions {
